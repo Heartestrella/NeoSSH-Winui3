@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\Administrator\\\\source\\\\repos\\\\NeoSSH\\\\NeoSSH\")",
+      "Bash(findstr /v \".vs\")",
+      "Bash(findstr /v \"\\\\bin\"\" | findstr /v \"obj\"\")"
+    ]
+  }
+}

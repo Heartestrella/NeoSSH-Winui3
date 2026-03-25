@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="NeoSSH.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NeoSSH"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="8" Background="Transparent">
+
+            <!-- 搜索框 -->
+            <TextBox x:Name="SearchBox"
+                     PlaceholderText="搜索设置..."
+                     
+                     TextChanged="OnSearchTextChanged"
+                     Margin="0,0,0,12"/>
+
+            <!-- 无结果提示 -->
+            <TextBlock x:Name="NoResultsLabel"
+                       Text="没有匹配的设置项"
+                       Visibility="Collapsed"
+                       Margin="0,12,0,12"
+                       HorizontalAlignment="Center"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+            <!-- 语言 -->
+            <controls:SettingsCard Header="语言"
+                                   Description="更改应用程序语言（需要重启）"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE774;}">
+                <ComboBox x:Name="LanguageComboBox"
+                          SelectedIndex="0"
+                          SelectionChanged="OnLanguageChanged">
+                    <ComboBoxItem Content="系统默认"/>
+                    <ComboBoxItem Content="English"/>
+                    <ComboBoxItem Content="简体中文"/>
+                    <ComboBoxItem Content="日本語"/>
+                    <ComboBoxItem Content="Русский"/>
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 终端模式 -->
+            <!--<controls:SettingsCard Header="终端模式"
+                                   Description="选择终端交互模式"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE71A;}">
+                <ComboBox x:Name="TerminalModeComboBox"
+                          SelectionChanged="OnTerminalModeChanged">
+                    <ComboBoxItem Content="WebEngine（稳定版）"/>
+                    <ComboBoxItem Content="Python终端（高级版）"/>
+                </ComboBox>
+            </controls:SettingsCard>-->
+
+            <!-- 更新通道 -->
+            <controls:SettingsCard Header="更新通道"
+                                   Description="选择应用程序的更新通道"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE895;}">
+                <ComboBox x:Name="UpdateChannelComboBox"
+                          SelectionChanged="OnUpdateChannelChanged">
+                    <ComboBoxItem Content="无"/>
+                    <ComboBoxItem Content="稳定版"/>
+                    <ComboBoxItem Content="预览版"/>
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 启用右侧AI聊天 -->
+            <controls:SettingsCard Header="启用右侧面板AI聊天"
+                                   Description="在右侧启用AI聊天面板（需要重启）"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE8F2;}">
+                <ToggleSwitch x:Name="RightPanelAIChatToggle"
+                              Toggled="OnRightPanelAIChatToggled"/>
+            </controls:SettingsCard>
+
+            <!-- 背景颜色 -->
+            <controls:SettingsCard Header="背景颜色"
+                                   Description="调整背景颜色"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE790;}">
+                <ComboBox x:Name="BackgroundColorComboBox"
+                          SelectionChanged="OnBackgroundColorChanged">
+                    <ComboBoxItem Content="浅色"/>
+                    <ComboBoxItem Content="深色"/>
+                    <ComboBoxItem Content="跟随系统设置"/>
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 选择背景图片 -->
+            <controls:SettingsCard Header="自定义背景"
+                                   Description="设置自定义背景图片"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xEB9F;}">
+                <Button x:Name="PickBackgroundButton"
+                        Content="选择文件"
+                        Click="OnPickBackground"/>
+            </controls:SettingsCard>
+
+            <!-- 背景透明度 -->
+            <controls:SettingsCard Header="背景透明度"
+                                   Description="调整背景图片的不透明度">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <Slider x:Name="OpacitySlider"
+                            Minimum="0" Maximum="100"
+                            SmallChange="1" LargeChange="10"
+                            Width="200"
+                            ValueChanged="OnOpacitySliderValueChanged"/>
+                    <TextBlock x:Name="OpacityValueText"
+                               Text="100%"
+                               Width="40"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </controls:SettingsCard>
+
+            <!-- 清除背景 -->
+            <controls:SettingsCard Header="清除背景"
+                                   Description="恢复默认主题背景"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE74D;}">
+                <Button x:Name="ClearBackgroundButton"
+                        Content="清除"
+                        Click="OnClearBackground"/>
+            </controls:SettingsCard>
+
+            <!-- 锁定比例 -->
+            <controls:SettingsCard Header="锁定纵横比"
+                                   Description="影响背景图片的比例"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE71B;}">
+                <ToggleSwitch x:Name="LockRatioToggle"
+                              Toggled="OnLockRatioToggled"/>
+            </controls:SettingsCard>
+
+            <!-- 跟随CD目录 -->
+            <controls:SettingsCard Header="跟随CD目录"
+                                   Description="启用后文件管理器跟随新的CD目录（Beta）"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE8A5;}">
+                <ToggleSwitch x:Name="FollowCDToggle"
+                              Toggled="OnFollowCDToggled"/>
+            </controls:SettingsCard>
+
+            <!-- 设置字体 -->
+            <controls:SettingsCard Header="设置字体"
+                                   Description="更改终端字体"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE8C8;}">
+                <Button x:Name="SelectFontButton"
+                        Content="选择字体"
+                        Click="OnSelectFont"/>
+            </controls:SettingsCard>
+
+            <!-- 字体大小 -->
+            <controls:SettingsCard Header="字体大小"
+                                   Description="更改终端字体大小"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE8D3;}">
+                <ComboBox x:Name="FontSizeComboBox"
+                          SelectionChanged="OnFontSizeChanged">
+                    <!-- 填充12-30的数字 -->
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 默认文件管理器视图 -->
+            <controls:SettingsCard Header="默认文件管理器视图"
+                                   Description="设置文件管理器的默认视图"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE707;}">
+                <ComboBox x:Name="DefaultViewComboBox"
+                          SelectionChanged="OnDefaultViewChanged">
+                    <ComboBoxItem Content="图标"/>
+                    <ComboBoxItem Content="详情"/>
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 单击打开项目 -->
+            <controls:SettingsCard Header="单击打开项目"
+                                   Description="启用后单击文件树中的项目即可打开"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE77A;}">
+                <ToggleSwitch x:Name="SingleClickToggle"
+                              Toggled="OnSingleClickToggled"/>
+            </controls:SettingsCard>
+
+            <!-- 页面动画效果 -->
+            <controls:SettingsCard Header="页面动画效果"
+                                   Description="设置页面切换的动画效果"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE7B8;}">
+                <ComboBox x:Name="AnimationComboBox"
+                          SelectionChanged="OnAnimationChanged">
+                    <ComboBoxItem Content="滑动淡入"/>
+                    <ComboBoxItem Content="放大进入"/>
+                    <ComboBoxItem Content="缩小退出"/>
+                    <ComboBoxItem Content="交叉淡入"/>
+                    <ComboBoxItem Content="弹跳"/>
+                    <ComboBoxItem Content="弹性"/>
+                    <ComboBoxItem Content="淡入缩放"/>
+                    <ComboBoxItem Content="滑动缩放"/>
+                    <ComboBoxItem Content="堆叠"/>
+                </ComboBox>
+            </controls:SettingsCard>
+
+            <!-- 字体颜色选择器 -->
+            <controls:SettingsExpander
+                                       Description="设置SSH会话字体颜色（全局）"
+                                       HeaderIcon="{ui:FontIcon Glyph=&#xE790;}"
+                                       x:Name="FontColorExpander">
+                <controls:SettingsExpander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Border x:Name="FontColorPreview"
+                                Width="24" Height="24"
+                                CornerRadius="4"
+                                BorderThickness="1"
+                                BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                Background="White"/>
+                        <TextBlock x:Name="FontColorHexText"
+                                   Text="#FFFFFFFF"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Consolas"
+                                   FontSize="13"/>
+                    </StackPanel>
+                </controls:SettingsExpander.Header>
+                <controls:SettingsExpander.Content>
+                    <controls:SettingsCard>
+                        <Button x:Name="PickFontColorButton"
+                                Content="选择颜色"
+                                Click="OnPickFontColor"
+                                HorizontalAlignment="Left"/>
+                    </controls:SettingsCard>
+                </controls:SettingsExpander.Content>
+            </controls:SettingsExpander>
+
+            <!-- 彩蛋按钮 -->
+            <controls:SettingsCard Header="字面意思"
+                                   Description="点击延迟上学">
+                <Button x:Name="UnbelievableButton"
+                        Content="点击我延迟上学"
+                        Click="OnUnbelievableButtonClick"/>
+            </controls:SettingsCard>
+
+            <!-- 最大并发传输数 -->
+            <controls:SettingsCard Header="最大并发传输数"
+                                   Description="设置最大并发上传/下载数（必须 > 0 且 ≤ 50000）"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE81F;}">
+                <NumberBox x:Name="MaxConcurrentTransfersBox"
+                           Minimum="1" Maximum="50000"
+                           SmallChange="1" LargeChange="10"
+                           Value="4"
+                           ValueChanged="OnMaxConcurrentTransfersChanged"
+                           SpinButtonPlacementMode="Inline"
+                           Width="150"/>
+            </controls:SettingsCard>
+
+            <!-- 外部编辑器 -->
+            <controls:SettingsCard Header="外部编辑器"
+                                   Description="设置外部编辑器可执行文件的路径（例如 C:\Program Files\Notepad++\notepad++.exe）"
+                                   HeaderIcon="{ui:FontIcon Glyph=&#xE70F;}">
+                <TextBox x:Name="ExternalEditorTextBox"
+                         PlaceholderText="输入外部编辑器完整路径"
+                         
+                         TextChanged="OnExternalEditorTextChanged"
+                         MinWidth="300"/>
+            </controls:SettingsCard>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

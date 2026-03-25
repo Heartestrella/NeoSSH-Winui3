@@ -1,0 +1,112 @@
+CLAUDE.md
+
+# Build output
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Visual Studio
+.vs/
+*.swp
+*.swo
+*~
+*.sln.docstates
+*.opensdf
+*.sdf
+*.cachefile
+
+# Rider
+.idea/
+*.sln.iml
+
+# .NET / .NET Core
+packages/
+*.nupkg
+*.snupkg
+*.dll
+*.exe
+*.pdb
+*.ncrunchsolution
+*.ncrunchproject
+*.ncrunch.*
+*.crunchsolution.*
+*.crunchproject.*
+
+# NuGet
+*.nupkg
+*.snupkg
+nuget.exe
+packages/
+
+# Xamarin / MAUI / WinUI
+*.binlog
+*.pidb
+*.heapprof
+*.hcov
+*.csproj.user
+*.suo
+*.userprefs
+*.lock.json
+*.vspscc
+*.vssscc
+*.vsidx
+*.csproj.dotSettings
+*.xaml.cs.bak
+*.xaml.bak
+
+# Publishing
+publish/
+*.nupkg
+*.snupkg
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.tmp
+*.~lock.*
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Code coverage
+*.coverage
+*.coveragexml
+*.coveragex
+*.coveragebin
+*.dotCover
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database files
+*.mdf
+*.ldf
+*.sdf
+
+# Windows Image Cache
+*.exe.manifest
+*.sc

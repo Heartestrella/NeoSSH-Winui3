@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NeoSSH (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "NeoSSH (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
