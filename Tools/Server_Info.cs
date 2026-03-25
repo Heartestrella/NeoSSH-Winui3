@@ -31,21 +31,53 @@ namespace NeoSSH.Tools
         {
             try
             {
-                var command = client.RunCommand("top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1");
-                string result = command.Result.Trim();
-
-                if (!string.IsNullOrEmpty(result) && double.TryParse(result, out double cpuUsage))
+                // Attempt to read load averages from /proc/loadavg
+                // /proc/loadavg fields: 1min 5min 15min ...
+                // Linux doesn't provide a 3-minute value; we approximate the 3-minute average
+                // by interpolating between the 1-minute and 5-minute averages: avg3 ~= (1min + 5min) / 2
+                var cmd = client.RunCommand("cat /proc/loadavg");
+                var res = cmd.Result?.Trim();
+                if (!string.IsNullOrEmpty(res))
                 {
-                    return Math.Round(cpuUsage, 2);
+                    var parts = res.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 2 && double.TryParse(parts[0], out var oneMin) && double.TryParse(parts[1], out var fiveMin))
+                    {
+                        var approx3MinLoad = (oneMin + fiveMin) / 2.0; // approximation for 3-minute average
+
+                        // get number of CPU cores to normalize load to percentage
+                        int cores = 1;
+                        try
+                        {
+                            var ccmd = client.RunCommand("nproc");
+                            var cres = ccmd.Result?.Trim();
+                            if (!string.IsNullOrEmpty(cres) && int.TryParse(cres, out var n)) cores = Math.Max(1, n);
+                            else
+                            {
+                                // fallback: count processors from /proc/cpuinfo
+                                var ccmd2 = client.RunCommand("grep -c ^processor /proc/cpuinfo");
+                                var cres2 = ccmd2.Result?.Trim();
+                                if (!string.IsNullOrEmpty(cres2) && int.TryParse(cres2, out var n2)) cores = Math.Max(1, n2);
+                            }
+                        }
+                        catch { cores = 1; }
+
+                        // Convert load average to percentage relative to cores
+                        var percent = (approx3MinLoad / cores) * 100.0;
+                        if (percent < 0) percent = 0;
+                        // Do not artificially cap at 100; load can exceed cores (but UI progress bars may expect <=100)
+                        return Math.Round(percent, 2);
+                    }
                 }
 
-                command = client.RunCommand("mpstat 1 1 | awk 'END{print 100 - $NF}'");
-                result = command.Result.Trim();
-
-                if (!string.IsNullOrEmpty(result) && double.TryParse(result, out cpuUsage))
+                // Fallback: try mpstat quick sample (may not exist on all systems)
+                try
                 {
-                    return Math.Round(cpuUsage, 2);
+                    var mp = client.RunCommand("mpstat 1 1 | awk 'END{print 100 - $NF}'");
+                    var mres = mp.Result?.Trim();
+                    if (!string.IsNullOrEmpty(mres) && double.TryParse(mres, out var cpuUsage))
+                        return Math.Round(cpuUsage, 2);
                 }
+                catch { }
 
                 return 0;
             }

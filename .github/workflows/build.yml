@@ -1,0 +1,89 @@
+name: Build NeoSSH
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86, x64, ARM64]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # 恢复 NuGet 依赖（WinUI 3 项目需要指定平台）
+    - name: Restore dependencies
+      run: msbuild /t:Restore /p:Configuration=Release /p:Platform=${{ matrix.platform }}
+
+    # 编译（不打 MSIX 包，产出 Framework-dependent 可执行文件）
+    - name: Build
+      run: |
+        dotnet publish NeoSSH.csproj `
+          --configuration Release `
+          --runtime win-${{ matrix.platform == 'ARM64' && 'arm64' || matrix.platform }} `
+          --self-contained true `
+          /p:Platform=${{ matrix.platform }} `
+          /p:WindowsPackageType=None `
+          /p:PublishSingleFile=false `
+          /p:GenerateAppxPackageOnBuild=false `
+          --output ./publish/${{ matrix.platform }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NeoSSH-${{ matrix.platform }}
+        path: ./publish/${{ matrix.platform }}/
+        retention-days: 30
+
+  # 仅在推送版本 tag（v*.*.*）时创建 GitHub Release 并上传产物
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    # 将各平台文件夹压缩为 zip（方便用户下载）
+    - name: Zip artifacts
+      shell: pwsh
+      run: |
+        cd artifacts
+        Get-ChildItem -Directory | ForEach-Object {
+          Compress-Archive -Path "$($_.Name)/*" -DestinationPath "$($_.Name).zip"
+        }
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: NeoSSH ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: artifacts/*.zip
